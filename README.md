@@ -1,5 +1,5 @@
 # url-miner
-Finds hidden GET params  
+Finds hidden GET parameters by testing for reflection  
 
 # Usage
 Takes target urls from stdin, and a wordlist using the `-w` flag  
