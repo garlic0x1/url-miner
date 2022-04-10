@@ -10,7 +10,12 @@ import (
 
 // constructs payloads and creates an identifier for the injection point
 func buildPayload(params []string, u string) string {
-	str := u + "?"
+	str := u
+	if strings.Contains(u, "?") {
+		str += "&"
+	} else {
+		str += "?"
+	}
 	for i, s := range params {
 		hash := fmt.Sprintf("zzxy%d", i)
 		str += s + "=" + hash + "&"
@@ -24,7 +29,11 @@ func mine(params []string, u string) {
 	for i, param := range params {
 		hash := fmt.Sprintf("zzxy%d", i)
 		if strings.Contains(text, hash) {
-			Results <- fmt.Sprintf("[reflected] %s?%s=%s", u, param, hash)
+			if strings.Contains(u, "?") {
+				Results <- fmt.Sprintf("[reflected] %s&%s=%s", u, param, hash)
+			} else {
+				Results <- fmt.Sprintf("[reflected] %s?%s=%s", u, param, hash)
+			}
 		}
 	}
 }
