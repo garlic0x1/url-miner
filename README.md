@@ -1,5 +1,6 @@
 # url-miner
 Finds hidden GET parameters by testing for reflection  
+By default, 64 parameters are tested per request, this can be increased in some cases to 64,000 to significantly speed up your scan  
 
 # Usage
 Takes target urls from stdin, and a wordlist using the `-w` flag  
