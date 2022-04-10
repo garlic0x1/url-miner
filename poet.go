@@ -19,7 +19,7 @@ func buildPayload(params []string, u string) string {
 }
 
 func mine(params []string, u string, results chan string) {
-	text := request(buildPayload(params, u))
+	text := request(buildPayload(params, u), Timeout)
 
 	for i, param := range params {
 		hash := fmt.Sprintf("zzxy%d", i)
