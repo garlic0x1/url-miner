@@ -4,9 +4,12 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"net/url"
 	"os"
 	"sync"
 )
+
+var sm sync.Map
 
 // goroutine to handle output
 func writer(results chan string) {
@@ -15,6 +18,15 @@ func writer(results chan string) {
 	for res := range results {
 		fmt.Fprintln(w, res)
 	}
+}
+
+func isUnique(url string) bool {
+	_, present := sm.Load(url)
+	if present {
+		return false
+	}
+	sm.Store(url, true)
+	return true
 }
 
 func main() {
@@ -37,10 +49,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	// set up concurrency limit
+	// set up concurrency
 	sem := make(chan struct{}, *threads)
-
-	// Set up async
 	var wg sync.WaitGroup
 
 	// open chans
@@ -50,19 +60,28 @@ func main() {
 	go func() {
 		s := bufio.NewScanner(os.Stdin)
 		for s.Scan() {
-			u := s.Text()
+			u := ""
+			line := s.Text()
+			parsed, err := url.Parse(line)
+			if err != nil {
+				u = line
+			} else {
+				u = fmt.Sprintf("%s://%s%s", parsed.Scheme, parsed.Host, parsed.Path)
+			}
 
-			// start another goroutine if not too many
-			select {
-			case sem <- struct{}{}:
-				wg.Add(1)
-				go func() {
+			if isUnique(u) {
+				// start another goroutine if not too many
+				select {
+				case sem <- struct{}{}:
+					wg.Add(1)
+					go func() {
+						poet(u, *wordlist, *nparams, results)
+						<-sem
+						wg.Done()
+					}()
+				default:
 					poet(u, *wordlist, *nparams, results)
-					<-sem
-					wg.Done()
-				}()
-			default:
-				poet(u, *wordlist, *nparams, results)
+				}
 			}
 		}
 
