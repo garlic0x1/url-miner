@@ -57,12 +57,12 @@ func main() {
 			case sem <- struct{}{}:
 				wg.Add(1)
 				go func() {
-					mine(u, *wordlist, *nparams, results)
+					poet(u, *wordlist, *nparams, results)
 					<-sem
 					wg.Done()
 				}()
 			default:
-				mine(u, *wordlist, *nparams, results)
+				poet(u, *wordlist, *nparams, results)
 			}
 		}
 

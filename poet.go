@@ -18,8 +18,19 @@ func buildPayload(params []string, u string) string {
 	return str
 }
 
+func mine(params []string, u string, results chan string) {
+	text := request(buildPayload(params, u))
+
+	for i, param := range params {
+		hash := fmt.Sprintf("zzxy%d", i)
+		if strings.Contains(text, hash) {
+			results <- fmt.Sprintf("[reflected] %s=%s", param, hash)
+		}
+	}
+}
+
 // send keys that effect the response to results
-func mine(u string, wordlist string, nparams int, results chan string) {
+func poet(u string, wordlist string, nparams int, results chan string) {
 	//baseline := request(u)
 	var params []string
 	c := 0
@@ -36,14 +47,7 @@ func mine(u string, wordlist string, nparams int, results chan string) {
 			params = append(params, scanner.Text())
 			c++
 		} else {
-			text := request(buildPayload(params, u))
-
-			for i, param := range params {
-				hash := fmt.Sprintf("zzxy%d", i)
-				if strings.Contains(text, hash) {
-					fmt.Println("[reflected]", param+"="+hash)
-				}
-			}
+			mine(params, u, results)
 
 			// reset
 			params = []string{}
@@ -51,19 +55,7 @@ func mine(u string, wordlist string, nparams int, results chan string) {
 		}
 	}
 	if c != 0 {
-
-		text := request(buildPayload(params, u))
-
-		for i, param := range params {
-			hash := fmt.Sprintf("zzxy%d", i)
-			if strings.Contains(text, hash) {
-				results <- fmt.Sprintf("[reflected] %s=%s", param, hash)
-			}
-		}
-
-		// reset
-		params = []string{}
-		c = 0
+		mine(params, u, results)
 	}
 
 	if err := scanner.Err(); err != nil {
