@@ -124,9 +124,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// set up concurrency
-	//var wg sync.WaitGroup
-
 	// open chans
 	Results = make(chan string)
 	Queue = make(chan string, 1)
