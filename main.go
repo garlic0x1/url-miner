@@ -9,7 +9,12 @@ import (
 	"sync"
 )
 
-var sm sync.Map
+var (
+	sm       sync.Map
+	Timeout  int
+	Insecure bool
+	UseProxy = false
+)
 
 // goroutine to handle output
 func writer(results chan string) {
@@ -34,7 +39,17 @@ func main() {
 	threads := flag.Int("t", 8, "Number of threads to use.")
 	nparams := flag.Int("s", 64, "Number of params per request.")
 	wordlist := flag.String("w", "", "Wordlist to mine.")
+	insecure := flag.Bool("insecure", false, "Disable TLS verification.")
+	proxy := flag.String(("proxy"), "", "Proxy URL. E.g.: -proxy http://127.0.0.1:8080")
+	timeout := flag.Int("timeout", 20, "Request timeout.")
 	flag.Parse()
+	Insecure = *insecure
+	Timeout = *timeout
+
+	if *proxy != "" {
+		os.Setenv("PROXY", *proxy)
+		UseProxy = true
+	}
 
 	// check for wordlist
 	if *wordlist == "" {
