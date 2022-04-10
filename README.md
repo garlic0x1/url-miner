@@ -5,13 +5,9 @@ Finds hidden GET parameters by testing for reflection
 Takes target urls from stdin, and a wordlist using the `-w` flag  
 Example:
 ```
-$ echo https://www.google.com/search | url-miner  -w wordlist
-[reflected] q=zzxy0
-[reflected] search=zzxy1
-[reflected] video=zzxy2
-[reflected] query=zzxy7
-[reflected] hq=zzxy14
-[reflected] action=zzxy24
+$ echo https://ac4f1f281ee763c2c025718500780061.web-security-academy.net/ | ./url-miner  -w wordlist.txt -s 2000
+[reflected] number=zzxy3
+[reflected] search=zzxy39
 ```
 
 # Help
