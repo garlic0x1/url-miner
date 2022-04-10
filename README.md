@@ -7,18 +7,19 @@ By default, 64 parameters are tested per request, this can be increased in some 
 
 # Usage
 Takes target urls from stdin, and a wordlist using the `-w` flag  
-Example:
+Examples:
+```
+$ echo http://testphp.vulnweb.com/listproducts.php | url-miner -w wordlist.txt 
+[reflected] http://testphp.vulnweb.com/listproducts.php?cat=zzx54y
+[reflected] http://testphp.vulnweb.com/listproducts.php?artist=zzx60y
+```
 ```
 $ echo http://testphp.vulnweb.com/listproducts.php | hakrawler -u | grep -e "vulnweb.com" | url-miner -w wordlist.txt
 [reflected] http://testphp.vulnweb.com/listproducts.php?cat=zzx54y
 [reflected] http://testphp.vulnweb.com/listproducts.php?artist=zzx60y
 [reflected] http://testphp.vulnweb.com/hpp/?pp=zzx25y
-
-$ echo http://testphp.vulnweb.com/listproducts.php | url-miner -w wordlist.txt 
-ordlist.txt
-[reflected] http://testphp.vulnweb.com/listproducts.php?cat=zzx54y
-[reflected] http://testphp.vulnweb.com/listproducts.php?artist=zzx60y
 ```
+
 
 # Help
 ```
