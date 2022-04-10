@@ -51,7 +51,9 @@ func request(u string, timeout int) string {
 	bodyBytes, err := io.ReadAll(resp.Body)
 	resp.Body.Close()
 	if err != nil {
+		log.Println("Error reading response:", err)
 		return ""
 	}
+	//return bodyBytes
 	return string(bodyBytes)
 }
