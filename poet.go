@@ -4,31 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"log"
-	"math/rand"
 	"os"
 	"strings"
-	"time"
 )
-
-type injection struct {
-	Hash string
-	Key  string
-}
-
-var (
-	seededRand *rand.Rand = rand.New(
-		rand.NewSource(time.Now().UnixNano()))
-)
-
-// returns a random alphabetical string of provided length
-func randomString(length int) string {
-	charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	b := make([]byte, length)
-	for i := range b {
-		b[i] = charset[seededRand.Intn(len(charset))]
-	}
-	return string(b)
-}
 
 // constructs payloads and creates an identifier for the injection point
 func buildPayload(params []string, u string) string {
@@ -79,7 +57,7 @@ func mine(u string, wordlist string, nparams int, results chan string) {
 		for i, param := range params {
 			hash := fmt.Sprintf("zzxy%d", i)
 			if strings.Contains(text, hash) {
-				fmt.Println("[reflected]", param+"="+hash)
+				results <- fmt.Sprintf("[reflected] %s=%s", param, hash)
 			}
 		}
 
