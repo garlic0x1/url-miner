@@ -17,19 +17,12 @@ var (
 	UseProxy = false
 	Header   header
 	Queue    chan string
-	Results  chan string
+	Results  chan Result
 )
 
 type header struct {
 	name  string
 	value string
-}
-
-// goroutine to handle output
-func writer() {
-	for res := range Results {
-		fmt.Println(res)
-	}
 }
 
 // goroutine to handle input
@@ -130,7 +123,7 @@ func main() {
 	}
 
 	// open chans
-	Results = make(chan string)
+	Results = make(chan Result)
 	Queue = make(chan string, 1)
 
 	// start pushing input, when done, close Queue
