@@ -26,15 +26,10 @@ func buildPayload(params []string, u string) string {
 func mine(params []string, u string) {
 	text := request(buildPayload(params, u), Timeout)
 
-	for i, param := range params {
-		hash := fmt.Sprintf("zzxy%d", i)
-		if strings.Contains(text, hash) {
-			if strings.Contains(u, "?") {
-				Results <- fmt.Sprintf("[reflected] %s&%s=%s", u, param, hash)
-			} else {
-				Results <- fmt.Sprintf("[reflected] %s?%s=%s", u, param, hash)
-			}
-		}
+	Results <- Result{
+		URL:        u,
+		Parameters: params,
+		Response:   text,
 	}
 }
 
