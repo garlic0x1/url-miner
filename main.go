@@ -128,8 +128,12 @@ func main() {
 	Results = make(chan string)
 	Queue = make(chan string, 1)
 
-	// start pushing input
+	// start pushing input, when done, close Queue
 	go reader()
+	// start *threads workers
+	// ended by Queue closing, when done, close Results
 	go spawnWorkers(*threads, wordlist, nparams)
+	// start writing output
+	// ended by Results closing
 	writer()
 }
