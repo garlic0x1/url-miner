@@ -15,8 +15,9 @@ $ echo http://testphp.vulnweb.com/listproducts.php | hakrawler -u | grep -e "vul
 [reflected] http://testphp.vulnweb.com/hpp/?pp=zzx25y
 
 $ echo http://testphp.vulnweb.com/listproducts.php | url-miner -w wordlist.txt 
-[reflected] http://testphp.vulnweb.com/listproducts.php?cat=zzxy52
-[reflected] http://testphp.vulnweb.com/listproducts.php?artist=zzxy58
+ordlist.txt
+[reflected] http://testphp.vulnweb.com/listproducts.php?cat=zzx54y
+[reflected] http://testphp.vulnweb.com/listproducts.php?artist=zzx60y
 ```
 
 # Help
