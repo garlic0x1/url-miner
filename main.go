@@ -42,7 +42,7 @@ func reader() {
 }
 
 // worker routines
-func spawnWorkers(n int, wordlist *string, nparams *int) {
+func spawnWorkers(n int, wordlist *string, nparams *int, includeVals *bool) {
 	var wg sync.WaitGroup
 	for i := 0; i < n; i++ {
 		wg.Add(1)
@@ -54,7 +54,11 @@ func spawnWorkers(n int, wordlist *string, nparams *int) {
 				if err != nil {
 					u = line
 				} else {
-					u = fmt.Sprintf("%s://%s%s", parsed.Scheme, parsed.Host, parsed.Path)
+					if *includeVals {
+						u = line
+					} else {
+						u = fmt.Sprintf("%s://%s%s", parsed.Scheme, parsed.Host, parsed.Path)
+					}
 				}
 
 				if isUnique(u) {
@@ -64,7 +68,7 @@ func spawnWorkers(n int, wordlist *string, nparams *int) {
 			wg.Done()
 		}()
 	}
-	
+
 	// wait for all jobs to be finished before ending
 	wg.Wait()
 	close(Results)
@@ -93,6 +97,7 @@ func main() {
 	wordlist := flag.String("w", "", "Wordlist to mine.")
 	customheader := flag.String("head", "", "Custom header. Example: -head 'Hello: world'")
 	insecure := flag.Bool("insecure", false, "Disable TLS verification.")
+	includeVals := flag.Bool("d", false, "Include default GET values from input")
 	proxy := flag.String(("proxy"), "", "Proxy URL. Example: -proxy http://127.0.0.1:8080")
 	timeout := flag.Int("timeout", 20, "Request timeout.")
 	flag.Parse()
@@ -132,7 +137,7 @@ func main() {
 	go reader()
 	// start *threads workers
 	// ended by Queue closing, when done, close Results
-	go spawnWorkers(*threads, wordlist, nparams)
+	go spawnWorkers(*threads, wordlist, nparams, includeVals)
 	// start writing output
 	// ended by Results closing
 	writer()
