@@ -39,7 +39,7 @@ func request(u string, timeout int) string {
 	// perform request
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Error performing request", err)
+		//log.Println("Error performing request", err)
 		return ""
 	}
 	defer resp.Body.Close()
