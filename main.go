@@ -27,10 +27,7 @@ type header struct {
 
 // goroutine to handle output
 func writer() {
-	w := bufio.NewWriter(os.Stdout)
-	defer w.Flush()
 	for res := range Results {
-		//fmt.Fprintln(w, res)
 		fmt.Println(res)
 	}
 }
@@ -67,6 +64,8 @@ func spawnWorkers(n int, wordlist *string, nparams *int) {
 			wg.Done()
 		}()
 	}
+	
+	// wait for all jobs to be finished before ending
 	wg.Wait()
 	close(Results)
 }
@@ -106,6 +105,7 @@ func main() {
 		Header = header{hname, hvalue}
 	}
 
+	// set proxy
 	if *proxy != "" {
 		os.Setenv("PROXY", *proxy)
 		UseProxy = true
