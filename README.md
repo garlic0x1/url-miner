@@ -5,7 +5,7 @@ Finds hidden GET parameters by testing for reflection
 Takes target urls from stdin, and a wordlist using the `-w` flag  
 Example:
 ```
-$ echo http://testphp.vulnweb.com/listproducts.php | ./url-miner -w wordlist.txt 
+$ echo http://testphp.vulnweb.com/listproducts.php | url-miner -w wordlist.txt 
 [reflected] http://testphp.vulnweb.com/listproducts.php?comment=zzxy5
 [reflected] http://testphp.vulnweb.com/listproducts.php?cat=zzxy52
 [reflected] http://testphp.vulnweb.com/listproducts.php?newpassword=zzxy5
