@@ -3,7 +3,16 @@ Finds hidden GET parameters by testing for reflection
 
 # Usage
 Takes target urls from stdin, and a wordlist using the `-w` flag  
-Example: `$ cat endpoints.txt | url-miner -w wordlist.txt`  
+Example:
+```
+$ echo https://www.google.com/search | url-miner  -w wordlist
+[reflected] q=zzxy0
+[reflected] search=zzxy1
+[reflected] video=zzxy2
+[reflected] query=zzxy7
+[reflected] hq=zzxy14
+[reflected] action=zzxy24
+```
 
 # Help
 ```
