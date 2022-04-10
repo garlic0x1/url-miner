@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"strings"
 	"sync"
 )
 
@@ -14,7 +15,13 @@ var (
 	Timeout  int
 	Insecure bool
 	UseProxy = false
+	Header   header
 )
+
+type header struct {
+	name  string
+	value string
+}
 
 // goroutine to handle output
 func writer(results chan string) {
@@ -34,17 +41,31 @@ func isUnique(url string) bool {
 	return true
 }
 
+func parseHeader(h string) (string, string) {
+	split1 := strings.Split(h, ":")
+	name := strings.TrimSpace(split1[0])
+	value := strings.TrimSpace(split1[1])
+	return name, value
+}
+
 func main() {
 	// set up flags
 	threads := flag.Int("t", 8, "Number of threads to use.")
 	nparams := flag.Int("s", 64, "Number of params per request.")
 	wordlist := flag.String("w", "", "Wordlist to mine.")
+	customheader := flag.String("head", "", "Custom header. Example: -head 'Hello: world'")
 	insecure := flag.Bool("insecure", false, "Disable TLS verification.")
-	proxy := flag.String(("proxy"), "", "Proxy URL. E.g.: -proxy http://127.0.0.1:8080")
+	proxy := flag.String(("proxy"), "", "Proxy URL. Example: -proxy http://127.0.0.1:8080")
 	timeout := flag.Int("timeout", 20, "Request timeout.")
 	flag.Parse()
 	Insecure = *insecure
 	Timeout = *timeout
+
+	// set custom header
+	if *customheader != "" {
+		hname, hvalue := parseHeader(*customheader)
+		Header = header{hname, hvalue}
+	}
 
 	if *proxy != "" {
 		os.Setenv("PROXY", *proxy)
@@ -53,14 +74,14 @@ func main() {
 
 	// check for wordlist
 	if *wordlist == "" {
-		fmt.Fprintln(os.Stderr, "No wordlist detected, use `echo $url | mine-params -w $wordlist`")
+		fmt.Fprintln(os.Stderr, "No wordlist detected, use `cat urls.txt | url-miner -w wordlist.txt`")
 		os.Exit(1)
 	}
 
 	// check for stdin
 	stat, _ := os.Stdin.Stat()
 	if (stat.Mode() & os.ModeCharDevice) != 0 {
-		fmt.Fprintln(os.Stderr, "No input detected, use `echo $url | mine-params -w $wordlist`")
+		fmt.Fprintln(os.Stderr, "No input detected, use `cat urls.txt | url-miner -w wordlist.txt`")
 		os.Exit(1)
 	}
 

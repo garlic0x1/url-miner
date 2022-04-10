@@ -19,8 +19,12 @@ func request(u string, timeout int) string {
 		return ""
 	}
 
-	var client http.Client
+	// apply custom headers
+	if Header.name != "" && Header.value != "" {
+		req.Header.Set(Header.name, Header.value)
+	}
 
+	var client http.Client
 	if UseProxy {
 		client = http.Client{
 			Timeout: time.Duration(timeout) * time.Second,
