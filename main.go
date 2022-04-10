@@ -27,7 +27,10 @@ type header struct {
 
 // goroutine to handle output
 func writer() {
+	w := bufio.NewWriter(os.Stdout)
+	defer w.Flush()
 	for res := range Results {
+		//fmt.Fprintln(w, res)
 		fmt.Println(res)
 	}
 }
@@ -64,8 +67,6 @@ func spawnWorkers(n int, wordlist *string, nparams *int) {
 			wg.Done()
 		}()
 	}
-	
-	// wait for all jobs to be finished before ending
 	wg.Wait()
 	close(Results)
 }
@@ -105,7 +106,6 @@ func main() {
 		Header = header{hname, hvalue}
 	}
 
-	// set proxy
 	if *proxy != "" {
 		os.Setenv("PROXY", *proxy)
 		UseProxy = true
@@ -124,16 +124,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	// set up concurrency
+	//var wg sync.WaitGroup
+
 	// open chans
 	Results = make(chan string)
 	Queue = make(chan string, 1)
 
-	// start pushing input, when done, close Queue
+	// start pushing input
 	go reader()
-	// start *threads workers
-	// ended by Queue closing, when done, close Results
 	go spawnWorkers(*threads, wordlist, nparams)
-	// start writing output
-	// ended by Results closing
 	writer()
 }
