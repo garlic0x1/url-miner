@@ -17,7 +17,7 @@ func buildPayload(params []string, u string) string {
 		str += "?"
 	}
 	for i, s := range params {
-		hash := fmt.Sprintf("zzxy%d", i)
+		hash := fmt.Sprintf("zzx%dy", i)
 		str += s + "=" + hash + "&"
 	}
 	return str

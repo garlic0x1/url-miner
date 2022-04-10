@@ -15,7 +15,7 @@ type Result struct {
 func writer() {
 	for res := range Results {
 		for i, param := range res.Parameters {
-			hash := fmt.Sprintf("zzxy%d", i)
+			hash := fmt.Sprintf("zzx%dy", i)
 			if strings.Contains(res.Response, hash) {
 				if strings.Contains(res.URL, "?") {
 					fmt.Printf("[reflected] %s&%s=%s\n", res.URL, param, hash)
