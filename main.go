@@ -16,6 +16,8 @@ var (
 	Insecure bool
 	UseProxy = false
 	Header   header
+	Queue    chan string
+	Results  chan string
 )
 
 type header struct {
@@ -24,12 +26,49 @@ type header struct {
 }
 
 // goroutine to handle output
-func writer(results chan string) {
+func writer() {
 	w := bufio.NewWriter(os.Stdout)
 	defer w.Flush()
-	for res := range results {
-		fmt.Fprintln(w, res)
+	for res := range Results {
+		//fmt.Fprintln(w, res)
+		fmt.Println(res)
 	}
+}
+
+// goroutine to handle input
+func reader() {
+	s := bufio.NewScanner(os.Stdin)
+	for s.Scan() {
+		Queue <- s.Text()
+	}
+	close(Queue)
+}
+
+// worker routines
+func spawnWorkers(n int, wordlist *string, nparams *int) {
+	var wg sync.WaitGroup
+	for i := 0; i < n; i++ {
+		wg.Add(1)
+		go func() {
+			// pop from queue
+			for line := range Queue {
+				u := ""
+				parsed, err := url.Parse(line)
+				if err != nil {
+					u = line
+				} else {
+					u = fmt.Sprintf("%s://%s%s", parsed.Scheme, parsed.Host, parsed.Path)
+				}
+
+				if isUnique(u) {
+					poet(u, *wordlist, *nparams)
+				}
+			}
+			wg.Done()
+		}()
+	}
+	wg.Wait()
+	close(Results)
 }
 
 func isUnique(url string) bool {
@@ -86,46 +125,14 @@ func main() {
 	}
 
 	// set up concurrency
-	sem := make(chan struct{}, *threads)
-	var wg sync.WaitGroup
+	//var wg sync.WaitGroup
 
 	// open chans
-	results := make(chan string)
+	Results = make(chan string)
+	Queue = make(chan string, 1)
 
 	// start pushing input
-	go func() {
-		s := bufio.NewScanner(os.Stdin)
-		for s.Scan() {
-			u := ""
-			line := s.Text()
-			parsed, err := url.Parse(line)
-			if err != nil {
-				u = line
-			} else {
-				u = fmt.Sprintf("%s://%s%s", parsed.Scheme, parsed.Host, parsed.Path)
-			}
-
-			if isUnique(u) {
-				// start another goroutine if not too many
-				select {
-				case sem <- struct{}{}:
-					wg.Add(1)
-					go func() {
-						poet(u, *wordlist, *nparams, results)
-						<-sem
-						wg.Done()
-					}()
-				default:
-					poet(u, *wordlist, *nparams, results)
-				}
-			}
-		}
-
-		// close reults chan when all miners done, ending the program
-		wg.Wait()
-		close(results)
-	}()
-
-	// call writer, which closes after all workers are done
-	writer(results)
+	go reader()
+	go spawnWorkers(*threads, wordlist, nparams)
+	writer()
 }

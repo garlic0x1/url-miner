@@ -18,19 +18,19 @@ func buildPayload(params []string, u string) string {
 	return str
 }
 
-func mine(params []string, u string, results chan string) {
+func mine(params []string, u string) {
 	text := request(buildPayload(params, u), Timeout)
 
 	for i, param := range params {
 		hash := fmt.Sprintf("zzxy%d", i)
 		if strings.Contains(text, hash) {
-			results <- fmt.Sprintf("[reflected] %s=%s", param, hash)
+			Results <- fmt.Sprintf("[reflected] %s?%s=%s", u, param, hash)
 		}
 	}
 }
 
 // send keys that effect the response to results
-func poet(u string, wordlist string, nparams int, results chan string) {
+func poet(u string, wordlist string, nparams int) {
 	//baseline := request(u)
 	var params []string
 	c := 0
@@ -42,12 +42,13 @@ func poet(u string, wordlist string, nparams int, results chan string) {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
+
 	for scanner.Scan() {
 		if c < nparams {
 			params = append(params, scanner.Text())
 			c++
 		} else {
-			mine(params, u, results)
+			mine(params, u)
 
 			// reset
 			params = []string{}
@@ -55,7 +56,7 @@ func poet(u string, wordlist string, nparams int, results chan string) {
 		}
 	}
 	if c != 0 {
-		mine(params, u, results)
+		mine(params, u)
 	}
 
 	if err := scanner.Err(); err != nil {

@@ -15,49 +15,38 @@ func request(u string, timeout int) string {
 
 	req, err := http.NewRequest("GET", u, nil)
 	if err != nil {
-		log.Println("Error creating request", u)
+		log.Println("Error creating request", err)
 		return ""
 	}
+	req.Close = true
 
 	// apply custom headers
 	if Header.name != "" && Header.value != "" {
 		req.Header.Set(Header.name, Header.value)
 	}
 
-	var client http.Client
+	t := http.DefaultTransport.(*http.Transport).Clone()
+	t.TLSClientConfig = &tls.Config{InsecureSkipVerify: Insecure}
 	if UseProxy {
-		client = http.Client{
-			Timeout: time.Duration(timeout) * time.Second,
-			Transport: &http.Transport{
-				Proxy: http.ProxyURL(proxyURL),
-				TLSClientConfig: &tls.Config{
-					InsecureSkipVerify: Insecure,
-				},
-			},
-		}
-	} else {
-		client = http.Client{
-			Timeout: time.Duration(timeout) * time.Second,
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					InsecureSkipVerify: Insecure,
-				},
-			},
-		}
+		t.Proxy = http.ProxyURL(proxyURL)
+	}
+
+	client := http.Client{
+		Timeout:   time.Duration(timeout) * time.Second,
+		Transport: t,
 	}
 
 	// perform request
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Error performing request", u)
+		log.Println("Error performing request", err)
 		return ""
 	}
+	defer resp.Body.Close()
 	bodyBytes, err := io.ReadAll(resp.Body)
-	resp.Body.Close()
 	if err != nil {
 		log.Println("Error reading response:", err)
 		return ""
 	}
-	//return bodyBytes
 	return string(bodyBytes)
 }
