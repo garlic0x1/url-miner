@@ -18,10 +18,12 @@ $ echo https://www.google.com/search | url-miner  -w wordlist
 ```
 $ url-miner -h
 Usage of url-miner:
+  -head string
+    	Custom header. Example: -head 'Hello: world'
   -insecure
     	Disable TLS verification.
   -proxy string
-    	Proxy URL. E.g.: -proxy http://127.0.0.1:8080
+    	Proxy URL. Example: -proxy http://127.0.0.1:8080
   -s int
     	Number of params per request. (default 64)
   -t int
