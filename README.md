@@ -20,14 +20,17 @@ Takes target urls from stdin, and a wordlist using the `-w` flag
 Examples:
 ```
 $ echo http://testphp.vulnweb.com/listproducts.php | url-miner -w wordlist.txt 
-[reflected] http://testphp.vulnweb.com/listproducts.php?cat=zzx54y
-[reflected] http://testphp.vulnweb.com/listproducts.php?artist=zzx60y
+http://testphp.vulnweb.com/listproducts.php?cat=zzx54y
+http://testphp.vulnweb.com/listproducts.php?artist=zzx60y
 ```
 ```
-$ echo http://testphp.vulnweb.com/listproducts.php | hakrawler -u | grep -e "vulnweb.com" | url-miner -w wordlist.txt
-[reflected] http://testphp.vulnweb.com/listproducts.php?cat=zzx54y
-[reflected] http://testphp.vulnweb.com/listproducts.php?artist=zzx60y
-[reflected] http://testphp.vulnweb.com/hpp/?pp=zzx25y
+$ echo http://testphp.vulnweb.com/listproducts.php | hakrawler -u -d 4 | grep -e "vulnweb.com" | url-miner -w wordlist.txt
+http://testphp.vulnweb.com/listproducts.php?cat=zzx54y
+http://testphp.vulnweb.com/listproducts.php?artist=zzx60y
+http://testphp.vulnweb.com/hpp/?pp=zzx25y
+http://testphp.vulnweb.com/showimage.php?file=zzx24y
+http://testphp.vulnweb.com/hpp/params.php?p=zzx63y
+http://testphp.vulnweb.com/hpp/params.php?pp=zzx25y
 ```
 
 
