@@ -7,7 +7,7 @@ Go install:
 ```
 go install github.com/garlic0x1/url-miner@main
 ```  
-Docker install:  
+Docker install (uses default wordlist):  
 ```
 git clone https://github.com/garlic0x1/url-miner
 cd url-miner
