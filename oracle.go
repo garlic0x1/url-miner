@@ -5,24 +5,30 @@ import (
 	"strings"
 )
 
-type Result struct {
-	URL        string
-	Parameters []string
-	Response   string
-}
-
 // goroutine to handle output
 func writer() {
 	for res := range Results {
+		reflected := false
+		str := res.URL
+
+		if strings.Contains(res.URL, "?") {
+			str += "&"
+		} else {
+			str += "?"
+		}
+
 		for i, param := range res.Parameters {
 			hash := fmt.Sprintf("zzx%dy", i)
 			if strings.Contains(res.Response, hash) {
-				if strings.Contains(res.URL, "?") {
-					fmt.Printf("[reflected] %s&%s=%s\n", res.URL, param, hash)
-				} else {
-					fmt.Printf("[reflected] %s?%s=%s\n", res.URL, param, hash)
-				}
+				reflected = true
+				str += param + "=" + hash + "&"
 			}
+		}
+
+		if reflected {
+			// remove trailing '&'
+			str = str[:len(str)-1]
+			fmt.Println(str)
 		}
 	}
 }

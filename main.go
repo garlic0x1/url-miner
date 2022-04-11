@@ -20,6 +20,12 @@ var (
 	Results  chan Result
 )
 
+type Result struct {
+	URL        string
+	Parameters []string
+	Response   string
+}
+
 type header struct {
 	name  string
 	value string
