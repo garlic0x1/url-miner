@@ -3,7 +3,17 @@ Finds hidden GET parameters by testing for reflection
 By default, 64 parameters are tested per request, this can be increased in some cases to 64,000 to significantly speed up your scan  
 
 # Installation
-`$ go install github.com/garlic0x1/url-miner@main`  
+Go install:  
+```
+go install github.com/garlic0x1/url-miner@main
+```  
+Docker install:  
+```
+git clone https://github.com/garlic0x1/url-miner
+cd url-miner
+sudo docker build -t "garlic0x1/url-miner" .
+echo http://testphp.vulnweb.com/listproducts.php | sudo docker run --rm -i garlic0x1/url-miner
+```
 
 # Usage
 Takes target urls from stdin, and a wordlist using the `-w` flag  
