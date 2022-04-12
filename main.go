@@ -2,22 +2,27 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"flag"
 	"fmt"
 	"net/url"
 	"os"
 	"strings"
 	"sync"
+
+	"github.com/chromedp/chromedp"
 )
 
 var (
-	sm       sync.Map
-	Timeout  int
-	Insecure bool
-	UseProxy = false
-	Header   header
-	Queue    chan string
-	Results  chan Result
+	sm        sync.Map
+	Chrome    bool
+	ChromeCtx context.Context
+	Timeout   int
+	Insecure  bool
+	UseProxy  = false
+	Header    header
+	Queue     chan string
+	Results   chan Result
 )
 
 type Result struct {
@@ -46,6 +51,13 @@ func spawnWorkers(n int, wordlist *string, nparams *int, includeVals *bool) {
 	for i := 0; i < n; i++ {
 		wg.Add(1)
 		go func() {
+			// spin up a chrome tab to use as well if needed
+			var tab context.Context
+			if Chrome {
+				tctx, cancel := chromedp.NewContext(ChromeCtx)
+				tab = tctx
+				defer cancel()
+			}
 			// pop from queue
 			for line := range Queue {
 				u := ""
@@ -61,7 +73,7 @@ func spawnWorkers(n int, wordlist *string, nparams *int, includeVals *bool) {
 				}
 
 				if isUnique(u) {
-					poet(u, *wordlist, *nparams)
+					poet(u, *wordlist, *nparams, tab)
 				}
 			}
 			wg.Done()
@@ -96,13 +108,21 @@ func main() {
 	wordlist := flag.String("w", "", "Wordlist to mine.")
 	customheader := flag.String("head", "", "Custom header. Example: -head 'Hello: world'")
 	insecure := flag.Bool("insecure", false, "Disable TLS verification.")
+	chrome := flag.Bool("chrome", false, "Use headless browser to evaluate DOM.")
 	includeVals := flag.Bool("d", false, "Include default GET values from input")
 	proxy := flag.String(("proxy"), "", "Proxy URL. Example: -proxy http://127.0.0.1:8080")
 	timeout := flag.Int("timeout", 20, "Request timeout.")
 	flag.Parse()
 	Insecure = *insecure
 	Timeout = *timeout
+	Chrome = *chrome
 
+	// set up chrome ctx
+	if *chrome {
+		ctx, cancel := chromedp.NewExecAllocator(context.Background(), append(chromedp.DefaultExecAllocatorOptions[:], chromedp.Flag("headless", true))...)
+		ChromeCtx, cancel = chromedp.NewContext(ctx)
+		defer cancel()
+	}
 	// set custom header
 	if *customheader != "" {
 		hname, hvalue := parseHeader(*customheader)

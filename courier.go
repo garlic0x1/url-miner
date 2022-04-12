@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"io"
 	"log"
@@ -8,7 +9,35 @@ import (
 	"net/url"
 	"os"
 	"time"
+
+	"github.com/chromedp/chromedp"
 )
+
+func chromeRequest(u string, timeout int, ctx context.Context) string {
+	c1 := make(chan string, 1)
+
+	go func() {
+		var document string
+		err := chromedp.Run(ctx,
+			chromedp.Navigate(u),
+			chromedp.Evaluate("document.documentElement.innerHTML", &document),
+		)
+		if err != nil {
+			log.Println(err, u)
+			return
+		}
+
+		c1 <- document
+	}()
+
+	// listen to timer and response, whichever happens first
+	select {
+	case document := <-c1:
+		return document
+	case <-time.After(time.Duration(timeout) * time.Second):
+		return ""
+	}
+}
 
 func request(u string, timeout int) string {
 	proxyURL, _ := url.Parse(os.Getenv("PROXY"))

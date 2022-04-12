@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -23,6 +24,16 @@ func buildPayload(params []string, u string) string {
 	return str
 }
 
+func chromeMine(params []string, u string, tab context.Context) {
+	text := chromeRequest(buildPayload(params, u), Timeout, tab)
+
+	Results <- Result{
+		URL:        u,
+		Parameters: params,
+		Response:   text,
+	}
+}
+
 func mine(params []string, u string) {
 	text := request(buildPayload(params, u), Timeout)
 
@@ -34,8 +45,7 @@ func mine(params []string, u string) {
 }
 
 // send keys that effect the response to results
-func poet(u string, wordlist string, nparams int) {
-	//baseline := request(u)
+func poet(u string, wordlist string, nparams int, tab context.Context) {
 	var params []string
 	c := 0
 
@@ -52,7 +62,11 @@ func poet(u string, wordlist string, nparams int) {
 			params = append(params, scanner.Text())
 			c++
 		} else {
-			mine(params, u)
+			if Chrome {
+				chromeMine(params, u, tab)
+			} else {
+				mine(params, u)
+			}
 
 			// reset
 			params = []string{}
@@ -60,7 +74,11 @@ func poet(u string, wordlist string, nparams int) {
 		}
 	}
 	if c != 0 {
-		mine(params, u)
+		if Chrome {
+			chromeMine(params, u, tab)
+		} else {
+			mine(params, u)
+		}
 	}
 
 	if err := scanner.Err(); err != nil {
