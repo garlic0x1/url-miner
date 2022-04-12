@@ -1,6 +1,7 @@
 # url-miner
 Finds hidden GET parameters by testing for reflection  
 By default, 64 parameters are tested per request, this can be increased in some cases to 64,000 to significantly speed up your scan  
+Use `-chrome` to mine in a headless browser and detect DOM XSS  
 
 # Installation
 Go install:  
@@ -38,6 +39,9 @@ http://testphp.vulnweb.com/hpp/params.php?pp=zzx25y
 ```
 $ url-miner -h
 Usage of url-miner:
+  -chrome
+    	Use headless browser to evaluate DOM.
+  -d	Include default GET values from input.
   -head string
     	Custom header. Example: -head 'Hello: world'
   -insecure
@@ -52,5 +56,4 @@ Usage of url-miner:
     	Request timeout. (default 20)
   -w string
     	Wordlist to mine.
-
 ```
