@@ -109,7 +109,7 @@ func main() {
 	customheader := flag.String("head", "", "Custom header. Example: -head 'Hello: world'")
 	insecure := flag.Bool("insecure", false, "Disable TLS verification.")
 	chrome := flag.Bool("chrome", false, "Use headless browser to evaluate DOM.")
-	includeVals := flag.Bool("d", false, "Include default GET values from input")
+	includeVals := flag.Bool("d", false, "Include default GET values from input.")
 	proxy := flag.String(("proxy"), "", "Proxy URL. Example: -proxy http://127.0.0.1:8080")
 	timeout := flag.Int("timeout", 20, "Request timeout.")
 	flag.Parse()
@@ -119,7 +119,12 @@ func main() {
 
 	// set up chrome ctx
 	if *chrome {
-		ctx, cancel := chromedp.NewExecAllocator(context.Background(), append(chromedp.DefaultExecAllocatorOptions[:], chromedp.Flag("headless", true))...)
+		ctx, cancel := chromedp.NewExecAllocator(context.Background(), append(chromedp.DefaultExecAllocatorOptions[:],
+
+			// block all images
+			chromedp.Flag("blink-settings", "imagesEnabled=false"),
+			chromedp.Flag("headless", true))...)
+
 		ChromeCtx, cancel = chromedp.NewContext(ctx)
 		defer cancel()
 	}
