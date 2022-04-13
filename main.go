@@ -123,7 +123,7 @@ func main() {
 	// set up chrome ctx
 	if *chrome {
 		ctx, cancel := chromedp.NewExecAllocator(context.Background(), append(chromedp.DefaultExecAllocatorOptions[:],
-
+			chromedp.ProxyServer(*proxy),
 			// block all images
 			chromedp.Flag("blink-settings", "imagesEnabled=false"),
 			chromedp.Flag("headless", true))...)
