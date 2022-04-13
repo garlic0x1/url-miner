@@ -23,7 +23,7 @@ func chromeRequest(u string, timeout int, ctx context.Context) string {
 			chromedp.Evaluate("document.documentElement.innerHTML", &document),
 		)
 		if err != nil {
-			log.Println(err, u)
+			//log.Println(err, u)
 			return
 		}
 
