@@ -20,7 +20,7 @@ func chromeRequest(u string, timeout int, ctx context.Context) string {
 		var document string
 		err := chromedp.Run(ctx,
 			chromedp.Navigate(u),
-			chromedp.Sleep(1*time.Second),
+			chromedp.Sleep(time.Duration(ScriptWait)*time.Second),
 			chromedp.Evaluate(`document.getElementsByTagName('html')[0].innerHTML;`, &document),
 		)
 		if err != nil {

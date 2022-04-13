@@ -14,15 +14,16 @@ import (
 )
 
 var (
-	sm        sync.Map
-	Chrome    bool
-	ChromeCtx context.Context
-	Timeout   int
-	Insecure  bool
-	UseProxy  = false
-	Header    header
-	Queue     chan string
-	Results   chan Result
+	sm         sync.Map
+	Chrome     bool
+	ChromeCtx  context.Context
+	Timeout    int
+	ScriptWait int
+	Insecure   bool
+	UseProxy   = false
+	Header     header
+	Queue      chan string
+	Results    chan Result
 )
 
 type Result struct {
@@ -112,7 +113,9 @@ func main() {
 	includeVals := flag.Bool("d", false, "Include default GET values from input.")
 	proxy := flag.String(("proxy"), "", "Proxy URL. Example: -proxy http://127.0.0.1:8080")
 	timeout := flag.Int("timeout", 20, "Request timeout.")
+	swait := flag.Int("wait", 0, "Seconds to wait on page after loading in chrome mode. (Use to wait for AJAX reqs)")
 	flag.Parse()
+	ScriptWait = *swait
 	Insecure = *insecure
 	Timeout = *timeout
 	Chrome = *chrome
