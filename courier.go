@@ -10,43 +10,54 @@ import (
 	"os"
 	"time"
 
+	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/chromedp"
 )
 
-func chromeRequest(u string, timeout int, ctx context.Context) string {
-	c1 := make(chan string, 1)
+func chromeRequest(u string, params []string, timeout int, ctx context.Context) {
+	buildUrl := buildPayload(params, u)
+	timed := make(chan string, 1)
 
 	go func() {
 		var document string
 		err := chromedp.Run(ctx,
-			chromedp.Navigate(u),
+			network.Enable(),
+			network.SetExtraHTTPHeaders(network.Headers(HeaderMap)),
+			chromedp.Navigate(buildUrl),
 			chromedp.Sleep(time.Duration(ScriptWait)*time.Second),
-			chromedp.Evaluate(`document.getElementsByTagName('html')[0].innerHTML;`, &document),
+			chromedp.OuterHTML(`html`, &document),
 		)
 		if err != nil {
 			//log.Println(err, u)
 			return
 		}
 
-		c1 <- document
+		timed <- document
 	}()
 
 	// listen to timer and response, whichever happens first
 	select {
-	case document := <-c1:
-		return document
+	case document := <-timed:
+		// send to oracle
+		Results <- Result{
+			URL:        u,
+			Parameters: params,
+			Response:   document,
+		}
+		return
 	case <-time.After(time.Duration(timeout) * time.Second):
-		return ""
+		return
 	}
 }
 
-func request(u string, timeout int) string {
+func request(u string, params []string, timeout int) {
+	buildUrl := buildPayload(params, u)
 	proxyURL, _ := url.Parse(os.Getenv("PROXY"))
 
-	req, err := http.NewRequest("GET", u, nil)
+	req, err := http.NewRequest("GET", buildUrl, nil)
 	if err != nil {
 		log.Println("Error creating request", err)
-		return ""
+		return
 	}
 	req.Close = true
 
@@ -70,13 +81,19 @@ func request(u string, timeout int) string {
 	resp, err := client.Do(req)
 	if err != nil {
 		//log.Println("Error performing request", err)
-		return ""
+		return
 	}
 	defer resp.Body.Close()
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println("Error reading response:", err)
-		return ""
+		return
 	}
-	return string(bodyBytes)
+
+	// send to oracle
+	Results <- Result{
+		URL:        u,
+		Parameters: params,
+		Response:   string(bodyBytes),
+	}
 }

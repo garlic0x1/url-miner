@@ -22,6 +22,7 @@ var (
 	Insecure   bool
 	UseProxy   = false
 	Header     header
+	HeaderMap  = make(map[string]interface{})
 	Queue      chan string
 	Results    chan Result
 )
@@ -99,6 +100,7 @@ func parseHeader(h string) (string, string) {
 	split1 := strings.Split(h, ":")
 	name := strings.TrimSpace(split1[0])
 	value := strings.TrimSpace(split1[1])
+	HeaderMap[name] = value
 	return name, value
 }
 
@@ -113,6 +115,7 @@ func main() {
 	includeVals := flag.Bool("d", false, "Include default GET values from input.")
 	proxy := flag.String(("proxy"), "", "Proxy URL. Example: -proxy http://127.0.0.1:8080")
 	timeout := flag.Int("timeout", 20, "Request timeout.")
+	debug := flag.Bool("debug", false, "Disable headless mode when using -chrome.")
 	swait := flag.Int("wait", 0, "Seconds to wait on page after loading in chrome mode. (Use to wait for AJAX reqs)")
 	flag.Parse()
 	ScriptWait = *swait
@@ -126,9 +129,9 @@ func main() {
 			chromedp.ProxyServer(*proxy),
 			// block all images
 			chromedp.Flag("blink-settings", "imagesEnabled=false"),
-			chromedp.Flag("headless", true))...)
+			chromedp.Flag("headless", !(*debug)))...)
 
-		ChromeCtx, cancel = chromedp.NewContext(ctx)
+		ChromeCtx = ctx
 		defer cancel()
 	}
 	// set custom header
