@@ -24,26 +24,6 @@ func buildPayload(params []string, u string) string {
 	return str
 }
 
-func chromeMine(params []string, u string, tab context.Context) {
-	text := chromeRequest(buildPayload(params, u), Timeout, tab)
-
-	Results <- Result{
-		URL:        u,
-		Parameters: params,
-		Response:   text,
-	}
-}
-
-func mine(params []string, u string) {
-	text := request(buildPayload(params, u), Timeout)
-
-	Results <- Result{
-		URL:        u,
-		Parameters: params,
-		Response:   text,
-	}
-}
-
 // send keys that effect the response to results
 func poet(u string, wordlist string, nparams int, tab context.Context) {
 	var params []string
@@ -63,9 +43,9 @@ func poet(u string, wordlist string, nparams int, tab context.Context) {
 			c++
 		} else {
 			if Chrome {
-				chromeMine(params, u, tab)
+				chromeRequest(u, params, Timeout, tab)
 			} else {
-				mine(params, u)
+				request(u, params, Timeout)
 			}
 
 			// reset
@@ -75,9 +55,9 @@ func poet(u string, wordlist string, nparams int, tab context.Context) {
 	}
 	if c != 0 {
 		if Chrome {
-			chromeMine(params, u, tab)
+			chromeRequest(u, params, Timeout, tab)
 		} else {
-			mine(params, u)
+			request(u, params, Timeout)
 		}
 	}
 
