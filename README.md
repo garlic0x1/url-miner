@@ -25,11 +25,13 @@ echo http://testphp.vulnweb.com/listproducts.php | sudo docker run --rm -i garli
 # Usage
 Takes target urls from stdin, and a wordlist using the `-w` flag  
 Examples:
+Single URL, headless mining:
 ```
-$ echo http://testphp.vulnweb.com/listproducts.php | url-miner -w wordlist.txt 
+$ echo http://testphp.vulnweb.com/listproducts.php | url-miner -w wordlist.txt -chrome
 http://testphp.vulnweb.com/listproducts.php?cat=zzx54y
 http://testphp.vulnweb.com/listproducts.php?artist=zzx60y
 ```
+Multiple URLs:
 ```
 $ echo http://testphp.vulnweb.com/listproducts.php | hakrawler -u -d 4 | grep -e "vulnweb.com" | url-miner -w wordlist.txt
 http://testphp.vulnweb.com/listproducts.php?cat=zzx54y
