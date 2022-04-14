@@ -4,7 +4,13 @@ By default, 64 parameters are tested per request, this can be increased in some 
 Use `-chrome` to mine in a headless browser and detect DOM XSS  
 
 # Installation
-Go install:  
+Source install (Recommended):
+```
+git clone https://github.com/garlic0x1/url-miner
+cd url-miner
+go install .
+```
+Go install (May be out of date):  
 ```
 go install github.com/garlic0x1/url-miner@main
 ```  
