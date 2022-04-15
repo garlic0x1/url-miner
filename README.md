@@ -50,10 +50,14 @@ Usage of url-miner:
   -chrome
     	Use headless browser to evaluate DOM.
   -d	Include default GET values from input.
+  -debug
+    	Disable headless mode when using -chrome.
   -head string
     	Custom header. Example: -head 'Hello: world'
   -insecure
     	Disable TLS verification.
+  -json
+    	Output injection points as JSON.
   -proxy string
     	Proxy URL. Example: -proxy http://127.0.0.1:8080
   -s int
@@ -64,4 +68,6 @@ Usage of url-miner:
     	Request timeout. (default 20)
   -w string
     	Wordlist to mine.
+  -wait int
+    	Seconds to wait on page after loading in chrome mode. (Use to wait for AJAX reqs)
 ```
