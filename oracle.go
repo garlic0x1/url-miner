@@ -1,17 +1,27 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/url"
 	"strings"
 	"sync"
 )
+
+type Output struct {
+	URL  string
+	Keys []string
+}
 
 var (
 	Filter sync.Map
 )
 
 func filter(u string, n int) bool {
+	if n < 4 {
+		return true
+	}
 	parsed, _ := url.Parse(u)
 	buildurl := parsed.Scheme + "://" + parsed.Host + parsed.Path
 	str := fmt.Sprintf("%d%s", n, buildurl)
@@ -28,6 +38,7 @@ func writer() {
 	for res := range Results {
 		reflected := 0
 		str := res.URL
+		keys := []string{}
 
 		if strings.Contains(res.URL, "?") {
 			str += "&"
@@ -40,6 +51,7 @@ func writer() {
 			if strings.Contains(res.Response, hash) {
 				reflected++
 				str += param + "=" + hash + "&"
+				keys = append(keys, param)
 			}
 		}
 
@@ -47,7 +59,19 @@ func writer() {
 		str = str[:len(str)-1]
 
 		if reflected > 0 && filter(str, reflected) {
-			fmt.Println(str)
+			if Json {
+				b, err := json.Marshal(Output{
+					URL:  res.URL,
+					Keys: keys,
+				})
+				if err != nil {
+					log.Println("Error:", err)
+					continue
+				}
+				fmt.Println(string(b))
+			} else {
+				fmt.Println(str)
+			}
 		}
 	}
 }

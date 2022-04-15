@@ -15,6 +15,7 @@ import (
 
 var (
 	sm         sync.Map
+	Json       bool
 	Chrome     bool
 	ChromeCtx  context.Context
 	Timeout    int
@@ -112,6 +113,7 @@ func main() {
 	customheader := flag.String("head", "", "Custom header. Example: -head 'Hello: world'")
 	insecure := flag.Bool("insecure", false, "Disable TLS verification.")
 	chrome := flag.Bool("chrome", false, "Use headless browser to evaluate DOM.")
+	json := flag.Bool("json", false, "Output injection points as JSON.")
 	includeVals := flag.Bool("d", false, "Include default GET values from input.")
 	proxy := flag.String(("proxy"), "", "Proxy URL. Example: -proxy http://127.0.0.1:8080")
 	timeout := flag.Int("timeout", 20, "Request timeout.")
@@ -121,6 +123,7 @@ func main() {
 	ScriptWait = *swait
 	Insecure = *insecure
 	Timeout = *timeout
+	Json = *json
 	Chrome = *chrome
 
 	// set up chrome ctx
