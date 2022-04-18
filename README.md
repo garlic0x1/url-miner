@@ -2,6 +2,7 @@
 Finds hidden GET parameters by testing for reflection  
 By default, 64 parameters are tested per request, this can be increased in some cases to 64,000 to significantly speed up your scan  
 Use `-chrome` to mine in a headless browser and detect DOM XSS  
+You can output JSON with `-json` or YAML with `-yaml`  
 
 # Installation
 Source install (Recommended):
