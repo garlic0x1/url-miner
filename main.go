@@ -16,6 +16,7 @@ import (
 var (
 	sm         sync.Map
 	Json       bool
+	Yaml       bool
 	Chrome     bool
 	ChromeCtx  context.Context
 	Timeout    int
@@ -114,6 +115,7 @@ func main() {
 	insecure := flag.Bool("insecure", false, "Disable TLS verification.")
 	chrome := flag.Bool("chrome", false, "Use headless browser to evaluate DOM.")
 	json := flag.Bool("json", false, "Output injection points as JSON.")
+	yaml := flag.Bool("yaml", false, "Output injection points as YAML.")
 	includeVals := flag.Bool("d", false, "Include default GET values from input.")
 	proxy := flag.String(("proxy"), "", "Proxy URL. Example: -proxy http://127.0.0.1:8080")
 	timeout := flag.Int("timeout", 20, "Request timeout.")
@@ -124,6 +126,7 @@ func main() {
 	Insecure = *insecure
 	Timeout = *timeout
 	Json = *json
+	Yaml = *yaml
 	Chrome = *chrome
 
 	// set up chrome ctx
