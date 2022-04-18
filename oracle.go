@@ -7,6 +7,8 @@ import (
 	"net/url"
 	"strings"
 	"sync"
+
+	"gopkg.in/yaml.v2"
 )
 
 type Output struct {
@@ -61,6 +63,16 @@ func writer() {
 		if reflected > 0 && filter(str, reflected) {
 			if Json {
 				b, err := json.Marshal(Output{
+					URL:  res.URL,
+					Keys: keys,
+				})
+				if err != nil {
+					log.Println("Error:", err)
+					continue
+				}
+				fmt.Println(string(b))
+			} else if Yaml {
+				b, err := yaml.Marshal(Output{
 					URL:  res.URL,
 					Keys: keys,
 				})
